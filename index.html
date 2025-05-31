@@ -1,37 +1,476 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>一键拨号链接</title>
+    <title>金山区各镇联系电话</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
         body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: #333;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
-        .dial-button {
-            padding: 20px 40px;
-            font-size: 24px;
-            background-color: #007bff;
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #2c3e50, #34495e);
             color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            text-decoration: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 25px 20px;
+            position: relative;
         }
-        .dial-button:hover {
-            background-color: #0056b3;
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .watermark {
+            position: absolute;
+            right: 20px;
+            bottom: 15px;
+            font-size: 5rem;
+            opacity: 0.05;
+            transform: rotate(-20deg);
+            user-select: none;
+        }
+        
+        .content {
+            padding: 30px 25px;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .contact-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+        }
+        
+        .icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .town-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .phone-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #27ae60;
+            margin: 15px 0;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        .call-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #2ecc71, #1abc9c);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .call-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.6s;
+            z-index: -1;
+        }
+        
+        .call-btn:hover:before {
+            left: 100%;
+        }
+        
+        .call-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+        
+        .call-btn i {
+            margin-right: 8px;
+        }
+        
+        .qr-section {
+            text-align: center;
+            padding: 30px 20px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .qr-code {
+            width: 180px;
+            height: 180px;
+            background: #fff;
+            margin: 0 auto;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .qr-code img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        
+        .qr-text {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .decoration {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+            z-index: 0;
+        }
+        
+        .dec-1 {
+            top: -150px;
+            right: -150px;
+        }
+        
+        .dec-2 {
+            bottom: -100px;
+            left: -100px;
+            width: 200px;
+            height: 200px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .phone-number {
+                font-size: 1.4rem;
+            }
+            
+            .call-btn {
+                padding: 12px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .town-name {
+                font-size: 1.3rem;
+            }
+            
+            .phone-number {
+                font-size: 1.3rem;
+            }
+            
+            .call-btn {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 修改电话号码：将 href="tel:67962161" 中的号码替换为你需要的 -->
-    <a href="tel:67962161" class="dial-button">点击一键拨打 67962161</a>
+    <div class="decoration dec-1"></div>
+    <div class="decoration dec-2"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>金山区各镇联系电话</h1>
+            <p>点击下方号码即可一键拨打，方便快捷</p>
+            <div class="watermark">☎</div>
+        </div>
+        
+        <div class="content">
+            <div class="contact-grid">
+                <!-- 第一列 -->
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-city"></i>
+                        </div>
+                        <div class="town-name">山阳镇</div>
+                    </div>
+                    <span class="phone-number">18939720752</span>
+                    <a href="tel:18939720752" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="town-name">张堰镇</div>
+                    </div>
+                    <span class="phone-number">18930162303</span>
+                    <a href="tel:18930162303" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-umbrella-beach"></i>
+                        </div>
+                        <div class="town-name">金山卫镇</div>
+                    </div>
+                    <span class="phone-number">18939722719</span>
+                    <a href="tel:18939722719" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <div class="town-name">高新区</div>
+                    </div>
+                    <span class="phone-number">18930226113</span>
+                    <a href="tel:18930226113" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="town-name">亭林镇</div>
+                    </div>
+                    <span class="phone-number">18930306218</span>
+                    <a href="tel:18930306218" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <div class="town-name">松隐地区</div>
+                    </div>
+                    <span class="phone-number">17321470313</span>
+                    <a href="tel:17321470313" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <!-- 第二列 -->
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-archway"></i>
+                        </div>
+                        <div class="town-name">吕巷镇</div>
+                    </div>
+                    <span class="phone-number">17321438850</span>
+                    <a href="tel:17321438850" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="town-name">廊下镇</div>
+                    </div>
+                    <span class="phone-number">17321410512</span>
+                    <a href="tel:17321410512" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <div class="town-name">枫泾镇</div>
+                    </div>
+                    <span class="phone-number">18930190582</span>
+                    <a href="tel:18930190582" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-tower-observation"></i>
+                        </div>
+                        <div class="town-name">兴塔地区</div>
+                    </div>
+                    <span class="phone-number">18930202736</span>
+                    <a href="tel:18930202736" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-south"></i>
+                        </div>
+                        <div class="town-name">朱泾城南</div>
+                    </div>
+                    <span class="phone-number">18901703792</span>
+                    <a href="tel:18901703792" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="card-header">
+                        <div class="icon">
+                            <i class="fas fa-north"></i>
+                        </div>
+                        <div class="town-name">朱泾城北</div>
+                    </div>
+                    <span class="phone-number">18901760802</span>
+                    <a href="tel:18901760802" class="call-btn"><i class="fas fa-phone-alt"></i> 一键拨打</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="qr-section">
+            <div class="qr-code">
+                <!-- 这里可以放置二维码图片 -->
+                <div style="width:150px;height:150px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:8px;">
+                    <div style="text-align:center;">
+                        <i class="fas fa-qrcode" style="font-size:60px;color:#3498db;"></i>
+                        <div style="font-size:14px;margin-top:5px;">扫码分享</div>
+                    </div>
+                </div>
+            </div>
+            <p class="qr-text">扫描二维码分享此页面</p>
+        </div>
+        
+        <div class="footer">
+            <p>请保存此页面以便随时联系</p>
+        </div>
+    </div>
+    
+    <script>
+        // 简单的交互效果
+        document.querySelectorAll('.contact-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.call-btn')) {
+                    this.classList.toggle('active');
+                }
+            });
+        });
+        
+        // 添加动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.contact-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
 </body>
 </html>
